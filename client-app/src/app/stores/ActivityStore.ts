@@ -1,7 +1,6 @@
 import { makeAutoObservable, runInAction } from "mobx";
 import agent from "../api/agent";
 import { IActivity } from "../models/Activity";
-import { v4 as uuid } from "uuid";
 
 export default class ActivityStore {
   activityRegistry: Map<string, IActivity> = new Map();
@@ -22,45 +21,63 @@ export default class ActivityStore {
 
   loadActivities = async () => {
     try {
-      (await agent.Activities.list())
-        .map((act) => ({
-          ...act,
-          date: act.date ? act.date.split("T")[0] : "",
-        }))
-        .forEach((act) => {
+      const activities = (await agent.Activities.list()).map((act) => ({
+        ...act,
+        date: act.date ? act.date.split("T")[0] : "",
+      }));
+
+      runInAction(() => {
+        activities.forEach((act) => {
           this.activityRegistry.set(act.id, act);
         });
+      });
     } catch (error) {
       console.log("error initial load:: ", error);
     } finally {
-      this.setLoadingInitial(false);
+      runInAction(() => {
+        this.setLoadingInitial(false);
+      });
     }
+  };
+
+  private getActivityFromMemory = (id: string) => {
+    return this.activityRegistry.get(id);
+  };
+
+  private setActivity = (activity: IActivity) => {
+    activity.date = activity.date.split("T")[0];
+    this.activityRegistry.set(activity.id, activity);
+  };
+
+  loadActivity = async (id: string) => {
+    let activity = this.getActivityFromMemory(id);
+    if (activity) {
+      this.selectedActivity = activity;
+    } else {
+      this.setLoadingInitial(true);
+      try {
+        activity = await agent.Activities.details(id);
+        runInAction(() => {
+          this.setActivity(activity!);
+          this.selectedActivity = activity;
+        });
+      } catch (error) {
+        console.log("Unable to get activity");
+      } finally {
+        runInAction(() => {
+          this.setLoadingInitial(false);
+        });
+      }
+    }
+    return activity;
   };
 
   setLoadingInitial = (isLoading: boolean) => {
     this.loadingInitial = isLoading;
   };
 
-  selectActivity = (id: string) => {
-    this.selectedActivity = this.activityRegistry.get(id);
-  };
-
-  cancelSelectActivity = () => {
-    this.selectedActivity = undefined;
-  };
-
-  openForm = (id?: string) => {
-    id ? this.selectActivity(id) : this.cancelSelectActivity();
-    this.editMode = true;
-  };
-
-  closeForm = () => {
-    this.editMode = false;
-  };
-
   createActivity = async (activity: IActivity) => {
     this.loading = true;
-    activity.id = uuid();
 
     try {
       await agent.Activities.create(activity);

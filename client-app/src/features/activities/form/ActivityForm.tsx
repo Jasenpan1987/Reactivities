@@ -1,34 +1,52 @@
 import { observer } from "mobx-react-lite";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import { useHistory, useParams } from "react-router";
+import { Link } from "react-router-dom";
 import { Button, Form, Segment } from "semantic-ui-react";
-import { IActivity } from "../../../app/models/Activity";
+import LoadingComponent from "../../../app/layout/LoadingComponent";
 import { useStore } from "../../../app/stores/store";
+import { v4 as uuid } from "uuid";
 
 const ActivityForm = () => {
+  const { id } = useParams<{ id: string }>();
+  const { push } = useHistory();
   const {
     activityStore: {
-      selectedActivity: activity,
-      closeForm,
       loading,
+      loadingInitial,
       createActivity,
       updateActivity,
+      loadActivity,
     },
   } = useStore();
-  const initValues =
-    activity ??
-    ({
-      title: "",
-      description: "",
-      category: "",
-      date: "",
-      city: "",
-      venue: "",
-    } as IActivity);
 
-  const [values, setValues] = useState(initValues);
+  const [values, setValues] = useState({
+    id: "",
+    title: "",
+    description: "",
+    category: "",
+    date: "",
+    city: "",
+    venue: "",
+  });
+
+  useEffect(() => {
+    if (id) {
+      loadActivity(id).then((activity) => {
+        setValues(activity!);
+      });
+    }
+  }, [id, loadActivity]);
 
   const handleSubmit = async () => {
-    activity?.id ? await updateActivity(values) : await createActivity(values);
+    if (values?.id) {
+      await updateActivity(values);
+      push(`/activities/${values.id}`);
+    } else {
+      let id = uuid();
+      await createActivity({ ...values, id });
+      push(`/activities/${id}`);
+    }
   };
 
   const handleChange = (
@@ -41,6 +59,10 @@ const ActivityForm = () => {
       [name]: value,
     }));
   };
+
+  if (loadingInitial && id) {
+    return <LoadingComponent content="Loading Activity..." />;
+  }
 
   return (
     <Segment clearing>
@@ -93,8 +115,9 @@ const ActivityForm = () => {
           floated="right"
           type="button"
           content="Cancel"
-          onClick={closeForm}
           disabled={loading}
+          as={Link}
+          to={id ? `/activities/${id}` : "activities"}
         />
       </Form>
     </Segment>
