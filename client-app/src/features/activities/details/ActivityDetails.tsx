@@ -1,27 +1,25 @@
+import { observer } from "mobx-react-lite";
 import React from "react";
 import { Button, Card, Image } from "semantic-ui-react";
-import { IActivity } from "../../../app/models/Activity";
+import { useStore } from "../../../app/stores/store";
 
-interface IProps {
-  activity: IActivity;
-  cancelSelectActivity: () => void;
-  openForm: (id: string) => void;
-}
-
-const ActivityDetails = ({
-  activity,
-  cancelSelectActivity,
-  openForm,
-}: IProps) => {
+const ActivityDetails = () => {
+  const {
+    activityStore: {
+      selectedActivity: activity,
+      openForm,
+      cancelSelectActivity,
+    },
+  } = useStore();
   return (
     <Card fluid>
-      <Image src={`/assets/categoryImages/${activity.category}.jpg`} />
+      <Image src={`/assets/categoryImages/${activity!.category}.jpg`} />
       <Card.Content>
-        <Card.Header>{activity.title}</Card.Header>
+        <Card.Header>{activity!.title}</Card.Header>
         <Card.Meta>
-          <span>{activity.date}</span>
+          <span>{activity!.date}</span>
         </Card.Meta>
-        <Card.Description>{activity.description}</Card.Description>
+        <Card.Description>{activity!.description}</Card.Description>
       </Card.Content>
       <Card.Content extra>
         <Button.Group widths={2}>
@@ -29,7 +27,7 @@ const ActivityDetails = ({
             basic
             color="blue"
             content="Edit"
-            onClick={() => openForm(activity.id)}
+            onClick={() => openForm(activity!.id)}
           />
           <Button
             basic
@@ -43,4 +41,4 @@ const ActivityDetails = ({
   );
 };
 
-export default ActivityDetails;
+export default observer(ActivityDetails);

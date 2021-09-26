@@ -28,8 +28,8 @@ const Activities = {
   details: (id: string) => request.get<IActivity>(`/activities/${id}`),
   create: (activity: IActivity) =>
     request.post<IActivity>("/activities", activity),
-  update: (id: string, activity: IActivity) =>
-    request.put<IActivity>(`/activities/${id}`, activity),
+  update: (activity: IActivity) =>
+    request.put<IActivity>(`/activities/${activity.id}`, activity),
   delete: (id: string) => request.del(`/activities/${id}`),
 };
 
