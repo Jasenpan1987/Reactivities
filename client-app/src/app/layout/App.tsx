@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
 import { v4 as uuid } from "uuid";
 import { Container } from "semantic-ui-react";
 import { IActivity } from "../models/Activity";
 import Navbar from "./Navbar";
 import ActivityDashboard from "../../features/activities/dashboard/ActivityDashboard";
+import agent from "../api/agent";
+import LoadingComponent from "./LoadingComponent";
 
 function App() {
   const [activities, setActivities] = useState<IActivity[]>([]);
@@ -12,12 +13,17 @@ function App() {
     IActivity | undefined
   >();
   const [editMode, setEditMode] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
 
   const loadActivities = async () => {
-    const response = await axios.get<IActivity[]>(
-      "http://localhost:5000/api/Activities"
-    );
-    setActivities(response.data);
+    const activities = (await agent.Activities.list()).map((act) => ({
+      ...act,
+      date: act.date ? act.date.split("T")[0] : "",
+    }));
+
+    setActivities(activities);
+    setLoading(false);
   };
 
   const handleSelectActivity = (id: string) => {
@@ -37,25 +43,52 @@ function App() {
     setEditMode(false);
   };
 
-  const handleCreateOrEditActivity = (activity: IActivity) => {
-    activity.id
-      ? setActivities((prev) => [
-          ...prev.filter((x) => x.id !== activity.id),
-          activity,
-        ])
-      : setActivities((prev) => [...prev, { ...activity, id: uuid() }]);
-
-    setEditMode(false);
-    setSelectedActivity(activity);
+  const handleCreateOrEditActivity = async (activity: IActivity) => {
+    setSubmitting(true);
+    try {
+      let activityForSave: IActivity = activity;
+      if (activityForSave.id) {
+        await agent.Activities.update(activityForSave.id, activityForSave);
+        setActivities((prev) =>
+          prev.map((act) =>
+            act.id === activityForSave.id ? activityForSave : act
+          )
+        );
+      } else {
+        activityForSave.id = uuid();
+        await agent.Activities.create(activityForSave);
+        setActivities((prev) => [...prev, activityForSave]);
+      }
+      setEditMode(false);
+      setSelectedActivity(activity);
+    } catch (error) {
+      console.log("unable to save:: ", error);
+      throw error;
+    } finally {
+      setSubmitting(false);
+    }
   };
 
-  const handleDeleteActivity = (id: string) => {
-    setActivities((prev) => [...prev.filter((x) => x.id !== id)]);
+  const handleDeleteActivity = async (id: string) => {
+    setSubmitting(true);
+    try {
+      await agent.Activities.delete(id);
+      setActivities((prev) => [...prev.filter((x) => x.id !== id)]);
+    } catch (error) {
+      console.log("unable to delete:: ", error);
+      throw error;
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   useEffect(() => {
     loadActivities();
   }, []);
+
+  if (loading) {
+    return <LoadingComponent />;
+  }
 
   return (
     <>
@@ -71,6 +104,7 @@ function App() {
           closeForm={handleFormClose}
           createOrEdit={handleCreateOrEditActivity}
           deleteActivity={handleDeleteActivity}
+          submitting={submitting}
         />
       </Container>
     </>
