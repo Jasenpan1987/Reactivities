@@ -2,6 +2,7 @@ import React from "react";
 import { Link } from "react-router-dom";
 import { Button, Icon, Item, Segment } from "semantic-ui-react";
 import { IActivity } from "../../../app/models/Activity";
+import { format } from "date-fns";
 
 interface IProps {
   activity: IActivity;
@@ -26,7 +27,7 @@ function ActivityListItem({ activity }: IProps) {
       <Segment>
         <span>
           <Icon name="clock" />
-          {activity.date}
+          {format(activity.date!, "dd MM yyyy h:mm aa")}
           <Icon name="marker" />
           {activity.venue}
         </span>

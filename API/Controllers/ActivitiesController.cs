@@ -29,12 +29,14 @@ namespace API.Controllers
 
     [HttpPost]
     public async Task<IActionResult> CreateActivity([FromBody]Activity activity) {
+      activity.Date = DateTime.SpecifyKind(activity.Date, DateTimeKind.Utc);
       return HandleResult<Unit>(await Mediator.Send(new Create.Command{Activity = activity}));
     }
 
     [HttpPut("{id}")]
     public async Task<IActionResult> EditActivity(Guid id, [FromBody]Activity activity) {
       activity.Id = id;
+      activity.Date = DateTime.SpecifyKind(activity.Date, DateTimeKind.Utc);
       return HandleResult<Unit>(await Mediator.Send(new Edit.Command{Activity = activity}));
     }
 

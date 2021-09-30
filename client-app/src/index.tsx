@@ -8,6 +8,7 @@ import { createBrowserHistory } from "history";
 import reportWebVitals from "./reportWebVitals";
 import "react-calendar/dist/Calendar.css";
 import "react-toastify/dist/ReactToastify.min.css";
+import "react-datepicker/dist/react-datepicker.css";
 import "./app/layout/styles.css";
 
 export const history = createBrowserHistory();
