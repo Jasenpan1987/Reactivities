@@ -2,12 +2,21 @@ import axios, { AxiosError, AxiosResponse } from "axios";
 import { toast } from "react-toastify";
 import { history } from "../..";
 import { IActivity } from "../models/Activity";
+import { IUser, IUserFormValues } from "../models/User";
 import { store } from "../stores/store";
 
 const sleep = (delay: number) =>
   new Promise((resolve) => {
     return setTimeout(resolve, delay);
   });
+
+axios.interceptors.request.use(async (request) => {
+  const token = store.commonStore.token;
+  if (token) {
+    request.headers.Authorization = `Bearer ${token}`;
+  }
+  return request;
+});
 
 axios.interceptors.response.use(
   async (response) => {
@@ -63,9 +72,9 @@ const responseBody = <T>(response: AxiosResponse<T>) => response.data;
 
 const request = {
   get: <T>(url: string) => axios.get<T>(url).then(responseBody),
-  post: <T>(url: string, body: T) =>
+  post: <T>(url: string, body: {}) =>
     axios.post<T>(url, body).then(responseBody),
-  put: <T>(url: string, body: T) => axios.put<T>(url, body).then(responseBody),
+  put: <T>(url: string, body: {}) => axios.put<T>(url, body).then(responseBody),
   del: (url: string) => axios.delete(url).then(responseBody),
 };
 
@@ -79,8 +88,16 @@ const Activities = {
   delete: (id: string) => request.del(`/activities/${id}`),
 };
 
+const Account = {
+  current: () => request.get<IUser>("/account"),
+  login: (user: IUserFormValues) => request.post<IUser>("/account/login", user),
+  register: (user: IUserFormValues) =>
+    request.post<IUser>("/account/register", user),
+};
+
 const agent = {
   Activities,
+  Account,
 };
 
 export default agent;
