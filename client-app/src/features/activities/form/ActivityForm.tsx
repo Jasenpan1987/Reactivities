@@ -2,18 +2,18 @@ import { observer } from "mobx-react-lite";
 import React, { useEffect, useState } from "react";
 import { useHistory, useParams } from "react-router";
 import { Link } from "react-router-dom";
-import { Button, FormField, Header, Label, Segment } from "semantic-ui-react";
+import { Button, Header, Segment } from "semantic-ui-react";
 import LoadingComponent from "../../../app/layout/LoadingComponent";
 import { useStore } from "../../../app/stores/store";
 import { v4 as uuid } from "uuid";
-import { ErrorMessage, Field, Form, Formik } from "formik";
+import { Form, Formik } from "formik";
 import * as Yup from "yup";
 import MyTextInput from "../../../app/common/form/MyTextInput";
 import MyTextArea from "../../../app/common/form/MyTextArea";
 import MySelectInput from "../../../app/common/form/MySelectInput";
 import { categoryOptions } from "../../../app/common/options/CategoryOptions";
 import MyDateInput from "../../../app/common/form/MyDateInput";
-import { IActivity } from "../../../app/models/Activity";
+import { ActivityFormValues } from "../../../app/models/Activity";
 
 const ActivityForm = () => {
   const { id } = useParams<{ id: string }>();
@@ -28,26 +28,19 @@ const ActivityForm = () => {
     },
   } = useStore();
 
-  const [values, setValues] = useState<IActivity>({
-    id: "",
-    title: "",
-    description: "",
-    category: "",
-    date: null,
-    city: "",
-    venue: "",
-  });
+  const [values, setValues] = useState<ActivityFormValues>(
+    new ActivityFormValues()
+  );
 
   useEffect(() => {
     if (id) {
       loadActivity(id).then((activity) => {
-        setValues(activity!);
+        setValues(new ActivityFormValues(activity));
       });
     }
   }, [id, loadActivity]);
 
-  const handleFormSubmit = async (values: IActivity) => {
-    console.log(values);
+  const handleFormSubmit = async (values: ActivityFormValues) => {
     if (values?.id) {
       await updateActivity(values);
       push(`/activities/${values.id}`);
@@ -77,7 +70,7 @@ const ActivityForm = () => {
       <Formik
         enableReinitialize
         initialValues={values}
-        onSubmit={(values: IActivity) => handleFormSubmit(values)}
+        onSubmit={(values: ActivityFormValues) => handleFormSubmit(values)}
         validationSchema={validationSchema}
       >
         {({
