@@ -12,6 +12,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OpenApi.Models;
 using Persistence;
+using Infrastructure.Photos;
 
 namespace API.Extensions
 {
@@ -37,6 +38,8 @@ namespace API.Extensions
       services.AddMediatR(typeof(List.Handler).Assembly);
       services.AddAutoMapper(typeof(MappingProfiles).Assembly);
       services.AddScoped<IUserAccessor, UserAccessor>();
+      services.AddScoped<IPhotoAccessor, PhotoAccessor>();
+      services.Configure<CloudinarySettings>(config.GetSection("Cloudinary"));
 
       return services;
       }

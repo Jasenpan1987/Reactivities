@@ -20,7 +20,15 @@ namespace Application.Core
                     opt => opt.MapFrom(
                         source => source.Attendees.FirstOrDefault(x => x.IsHost)
                             .AppUser.UserName));
-            CreateMap<ActivityAttendee, Profiles.Profile>()
+
+            CreateMap<AppUser, Profiles.Profile>()
+                .ForMember(
+                    destination => destination.Image,
+                    opt => opt.MapFrom(s => s.Photos.FirstOrDefault(x => x.isMain).Url)
+                );
+                
+
+            CreateMap<ActivityAttendee, AttendeeDTO>()
                 .ForMember(
                     destination => destination.DisplayName,
                     opt => opt.MapFrom(
@@ -37,6 +45,12 @@ namespace Application.Core
                     destination => destination.Bio,
                     opt => opt.MapFrom(
                         source => source.AppUser.Bio
+                    )
+                )
+                .ForMember(
+                    destination => destination.Image,
+                    opt => opt.MapFrom(
+                        source => source.AppUser.Photos.FirstOrDefault(x => x.isMain).Url
                     )
                 );
                 
