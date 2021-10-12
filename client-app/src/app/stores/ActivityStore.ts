@@ -72,7 +72,7 @@ export default class ActivityStore {
     }
 
     activity.date = new Date(activity.date!);
-    console.log(activity);
+    // console.log(activity);
     this.activityRegistry.set(activity.id, activity);
   };
 

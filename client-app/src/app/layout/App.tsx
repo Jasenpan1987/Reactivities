@@ -14,6 +14,7 @@ import ServerError from "../../features/errors/ServerError";
 import { useStore } from "../stores/store";
 import LoadingComponent from "./LoadingComponent";
 import ModalContainer from "../common/modals/ModalContainer";
+import ProfilePage from "../../features/profiles/ProfilePage";
 
 function App() {
   const location = useLocation();
@@ -55,6 +56,11 @@ function App() {
                   path={["/createActivity", "/manage/:id"]}
                   component={ActivityForm}
                   key={location.key}
+                />
+                <Route
+                  exact
+                  path="/profiles/:username"
+                  component={ProfilePage}
                 />
                 <Route exact path="/errors" component={TestErrors} />
                 <Route path="/servererror" component={ServerError} />

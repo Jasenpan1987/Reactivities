@@ -22,7 +22,7 @@ export default observer(function ActivityListItemAttendee({
             <List.Item
               key={attendee.username}
               as={Link}
-              to={`/profile/${attendee.username}`}
+              to={`/profiles/${attendee.username}`}
             >
               <Image
                 size="mini"
