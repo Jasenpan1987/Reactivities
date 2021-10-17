@@ -17,5 +17,11 @@ namespace API.Controllers
                 Username = userName
             }));
         }
+
+        [HttpPut]
+        public async Task<IActionResult> UpdateProfile([FromBody]Update.Command command)
+        {
+            return HandleResult(await Mediator.Send(command));
+        }
     }
 }

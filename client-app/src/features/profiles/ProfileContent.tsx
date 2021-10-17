@@ -2,6 +2,7 @@ import { observer } from "mobx-react-lite";
 import React from "react";
 import { Tab } from "semantic-ui-react";
 import { Profile } from "../../app/models/Profile";
+import ProfileAbout from "./ProfileAbout";
 import ProfilePhotos from "./ProfilePhotos";
 
 interface IProps {
@@ -10,7 +11,7 @@ interface IProps {
 
 export default observer(function ProfileContent({ profile }: IProps) {
   const panes = [
-    { menuItem: "About", render: () => <Tab.Pane>About Content</Tab.Pane> },
+    { menuItem: "About", render: () => <ProfileAbout profile={profile} /> },
     { menuItem: "Photos", render: () => <ProfilePhotos profile={profile} /> },
     { menuItem: "Event", render: () => <Tab.Pane>Event Content</Tab.Pane> },
     {

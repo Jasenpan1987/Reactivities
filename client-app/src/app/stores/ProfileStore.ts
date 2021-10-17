@@ -104,4 +104,33 @@ export default class ProfileStore {
       });
     }
   };
+
+  updateProfile = async (
+    profile: Pick<Profile, "displayName" | "bio" | "username">
+  ) => {
+    this.loading = true;
+    try {
+      await agent.Profiles.updateProfile(profile);
+      runInAction(() => {
+        this.profile!.displayName = profile.displayName;
+        this.profile!.bio = profile.bio || this.profile!.bio;
+
+        store.userStore.user!.displayName = profile.displayName;
+        store.activityStore.activityRegistry.forEach((activity) => {
+          activity.attendees.forEach((attendee) => {
+            if (attendee.username === profile.username) {
+              attendee.displayName = profile.displayName;
+              attendee.bio = profile.bio || attendee.bio;
+            }
+          });
+        });
+      });
+    } catch (error) {
+      console.log(error);
+    } finally {
+      runInAction(() => {
+        this.loading = false;
+      });
+    }
+  };
 }
