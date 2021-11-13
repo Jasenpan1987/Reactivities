@@ -7,6 +7,7 @@ interface IProps {
   name: string;
   label?: string;
   rows: number;
+  style?: any;
 }
 
 export default function MyTextArea(props: IProps) {
