@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Application.Core;
+using Application.Interfaces;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using Domain;
@@ -25,9 +26,11 @@ namespace Application.Activities
       private readonly DataContext _context;
       private readonly ILogger _logger;
       private readonly IMapper _mapper;
+      private readonly IUserAccessor _accessor;
 
-      public Handler(DataContext context, ILogger<List> logger, IMapper mapper)
+      public Handler(DataContext context, ILogger<List> logger, IMapper mapper, IUserAccessor accessor)
       {
+        _accessor = accessor;
         _mapper = mapper;
         _logger = logger;
         _context = context;
@@ -48,7 +51,7 @@ namespace Application.Activities
         //   _logger.LogInformation("Task was cancelled.");
         // }
         var activities = await _context.Activities
-            .ProjectTo<ActivityDTO>(_mapper.ConfigurationProvider)
+            .ProjectTo<ActivityDTO>(_mapper.ConfigurationProvider, new {currentUsername = _accessor.GetUsername()})
             .ToListAsync(cancellationToken);
         return Result<List<ActivityDTO>>.Success(activities);
       }

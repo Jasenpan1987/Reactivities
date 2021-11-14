@@ -24,18 +24,20 @@ namespace Application.Profiles
     {
       private readonly DataContext _context;
       private readonly IMapper _mapper;
-      public Handler(DataContext context, IMapper mapper)
+      private readonly IUserAccessor _accessor;
+      public Handler(DataContext context, IMapper mapper, IUserAccessor accessor)
       {
+        _accessor = accessor;
         _mapper = mapper;
         _context = context;
       }
       public async Task<Result<Profile>> Handle(Query request, CancellationToken cancellationToken)
       {
           var user = await _context.Users
-            .ProjectTo<Profile>(_mapper.ConfigurationProvider)
+            .ProjectTo<Profile>(_mapper.ConfigurationProvider, new {currentUsername = _accessor.GetUsername()})
             .SingleOrDefaultAsync(x => x.Username == request.Username);
-
-            return Result<Profile>.Success(user);
+          
+          return Result<Profile>.Success(user);
       }
     }
   }

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Application.Core;
+using Application.Interfaces;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using Domain;
@@ -25,16 +26,18 @@ namespace Application.Activities
     {
       private readonly DataContext _context;
       private readonly IMapper _mapper;
+      private readonly IUserAccessor _accessor;
 
-      public Handler(DataContext context, IMapper mapper)
+      public Handler(DataContext context, IMapper mapper, IUserAccessor accessor)
       {
+        _accessor = accessor;
         _mapper = mapper;
         _context = context;
       }
       public async Task<Result<ActivityDTO>> Handle(Query request, CancellationToken cancellationToken)
       {
         var activity = await _context.Activities
-          .ProjectTo<ActivityDTO>(_mapper.ConfigurationProvider)
+          .ProjectTo<ActivityDTO>(_mapper.ConfigurationProvider, new {currentUsername = _accessor.GetUsername()})
           .FirstOrDefaultAsync(x => x.Id == request.Id);
 
         return Result<ActivityDTO>.Success(activity);
