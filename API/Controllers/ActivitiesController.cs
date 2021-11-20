@@ -11,15 +11,16 @@ using System.Threading;
 using Microsoft.AspNetCore.Authorization;
 using Application;
 using Application.Activities;
+using Application.Core;
 
 namespace API.Controllers
 {
   public class ActivitiesController : BaseAPIController
   {
     [HttpGet]
-    public async Task<IActionResult> GetActivities(CancellationToken token)
+    public async Task<IActionResult> GetActivities([FromQuery] ActivityParams activityParams)
     {
-      return HandleResult<List<ActivityDTO>>(await Mediator.Send(new List.Query(), token));
+      return HandlePagedResult(await Mediator.Send(new List.Query {ActivityParams = activityParams}));
     }
 
     [HttpGet("{id}")]

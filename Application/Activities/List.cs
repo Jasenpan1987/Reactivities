@@ -17,11 +17,12 @@ namespace Application.Activities
 {
   public class List
   {
-    public class Query : IRequest<Result<List<ActivityDTO>>>
+    public class Query : IRequest<Result<PagedList<ActivityDTO>>>
     {
+      public ActivityParams ActivityParams { get; set; }
     }
 
-    public class Handler : IRequestHandler<Query, Result<List<ActivityDTO>>>
+    public class Handler : IRequestHandler<Query, Result<PagedList<ActivityDTO>>>
     {
       private readonly DataContext _context;
       private readonly ILogger _logger;
@@ -35,25 +36,34 @@ namespace Application.Activities
         _logger = logger;
         _context = context;
       }
-      public async Task<Result<List<ActivityDTO>>> Handle(Query request, CancellationToken cancellationToken)
+      public async Task<Result<PagedList<ActivityDTO>>> Handle(Query request, CancellationToken cancellationToken)
       {
-        // try
-        // {
-        //     for (var i = 0; i < 10; i += 1)
-        //     {
-        //         cancellationToken.ThrowIfCancellationRequested();
-        //         await Task.Delay(1000, cancellationToken);
-        //         _logger.LogInformation($"Task {i} has completed");
-        //     }
-        // }
-        // catch (Exception ex) when (ex is TaskCanceledException)
-        // {
-        //   _logger.LogInformation("Task was cancelled.");
-        // }
-        var activities = await _context.Activities
+        var query = _context.Activities
+            .Where(d => d.Date >= request.ActivityParams.StartDate)
+            .OrderBy(d => d.Date)
             .ProjectTo<ActivityDTO>(_mapper.ConfigurationProvider, new {currentUsername = _accessor.GetUsername()})
-            .ToListAsync(cancellationToken);
-        return Result<List<ActivityDTO>>.Success(activities);
+            .AsQueryable();
+
+        if (request.ActivityParams.IsGoing && request.ActivityParams.IsHost)
+        {
+          return Result<PagedList<ActivityDTO>>.Success(null);
+        }
+
+        if (request.ActivityParams.IsGoing) {
+          query = query.Where(
+            act => act.HostUsername != _accessor.GetUsername() && 
+            act.Attendees.Any(at => at.Username == _accessor.GetUsername())
+          );
+        }
+
+        if (request.ActivityParams.IsHost) {
+          query = query.Where(act => act.HostUsername == _accessor.GetUsername());
+        }
+
+        
+        return Result<PagedList<ActivityDTO>>.Success(
+          await PagedList<ActivityDTO>.CreateAsync(query, request.ActivityParams.PageNumber, request.ActivityParams.PageSize)
+        );
       }
     }
   }
