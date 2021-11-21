@@ -34,7 +34,7 @@ namespace Application.Core
             CreateMap<AppUser, Profiles.Profile>()
                 .ForMember(
                     destination => destination.Image,
-                    opt => opt.MapFrom(s => s.Photos.FirstOrDefault(x => x.isMain).Url)
+                    opt => opt.MapFrom(s => s.Photos.FirstOrDefault(x => x.IsMain).Url)
                 )
                 .ForMember(
                     destination => destination.FollowerCount,
@@ -72,7 +72,7 @@ namespace Application.Core
                 .ForMember(
                     destination => destination.Image,
                     opt => opt.MapFrom(
-                        source => source.AppUser.Photos.FirstOrDefault(x => x.isMain).Url
+                        source => source.AppUser.Photos.FirstOrDefault(x => x.IsMain).Url
                     )
                 )
                 .ForMember(
@@ -104,7 +104,7 @@ namespace Application.Core
                     .ForMember(
                         destination => destination.Image,
                         opt => opt.MapFrom(
-                            source => source.Author.Photos.FirstOrDefault(x => x.isMain).Url
+                            source => source.Author.Photos.FirstOrDefault(x => x.IsMain).Url
                         )
                     );
                 

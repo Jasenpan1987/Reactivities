@@ -46,7 +46,7 @@ namespace Application.Photos
               return null;
           }
 
-          if (photo.isMain) {
+          if (photo.IsMain) {
               return Result<Unit>.Failure("Can not delete the main photo");
           }
 

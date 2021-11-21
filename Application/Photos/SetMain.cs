@@ -40,12 +40,12 @@ namespace Application.Photos
               return null;
           }
 
-          var userMainPhoto = user.Photos.FirstOrDefault(p => p.isMain);
+          var userMainPhoto = user.Photos.FirstOrDefault(p => p.IsMain);
           if (userMainPhoto != null) {
-              userMainPhoto.isMain = false;
+              userMainPhoto.IsMain = false;
           }
           
-          photo.isMain = true;
+          photo.IsMain = true;
 
           var success = await _dataContext.SaveChangesAsync() > 0;
 
