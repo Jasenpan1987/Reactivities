@@ -83,7 +83,8 @@ namespace API
           .CustomSources(
             "https://res.cloudinary.com", 
             "https://www.facebook.com",
-            "https://scontent.fsyd3-1.fna.fbcdn.net"
+            "https://scontent.fsyd3-1.fna.fbcdn.net",
+            "https://scontent-iad3-1.xx.fbcdn.net"
           )
         )
         .ScriptSources(s => s.Self()
