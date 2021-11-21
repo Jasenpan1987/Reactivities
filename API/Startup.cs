@@ -71,6 +71,9 @@ namespace API
 
       app.UseRouting();
 
+      app.UseDefaultFiles();
+      app.UseStaticFiles();
+
       app.UseCors("CorsPolicy");
 
       app.UseAuthentication(); // this has be run before app.UseAuthorization
@@ -81,6 +84,7 @@ namespace API
       {
         endpoints.MapControllers();
         endpoints.MapHub<SignalR.ChatHub>("/chat");
+        endpoints.MapFallbackToController("Index", "Fallback");
       });
     }
   }
