@@ -36,8 +36,9 @@
   },
   "scripts": {
     "start": "react-scripts start",
+    "startHttps": "HTTPS=true npm start",
     "build": "react-scripts build",
-    "postbuild": "mv build ../API/wwwroot",
+    "postbuild": "rimraf ../API/wwwroot && mv build ../API/wwwroot",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
@@ -60,10 +61,12 @@
     ]
   },
   "devDependencies": {
+    "@types/facebook-js-sdk": "^3.3.5",
     "@types/react-calendar": "^3.4.3",
     "@types/react-datepicker": "^4.1.7",
     "@types/react-infinite-scroller": "^1.2.2",
     "@types/react-router-dom": "^5.3.0",
-    "@types/uuid": "^8.3.1"
+    "@types/uuid": "^8.3.1",
+    "rimraf": "^3.0.2"
   }
 }

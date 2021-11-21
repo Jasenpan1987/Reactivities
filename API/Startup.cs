@@ -69,7 +69,10 @@ namespace API
       app.UseCsp(opt => opt
         .BlockAllMixedContent()
         .StyleSources(s => s.Self()
-          .CustomSources("https://fonts.googleapis.com")
+          .CustomSources(
+            "https://fonts.googleapis.com", 
+            "sha256-yChqzBduCCi4o4xdbXRXh4U/t1rP4UUUMJt+rB+ylUI="
+          )
         )
         .FontSources(s => s.Self()
           .CustomSources("https://fonts.gstatic.com", "data:")
@@ -77,10 +80,19 @@ namespace API
         .FormActions(s => s.Self())
         .FrameAncestors(s => s.Self())
         .ImageSources(s => s.Self()
-          .CustomSources("https://res.cloudinary.com")
+          .CustomSources(
+            "https://res.cloudinary.com", 
+            "https://www.facebook.com",
+            "https://scontent.fsyd3-1.fna.fbcdn.net"
+          )
         )
         .ScriptSources(s => s.Self()
-          .CustomSources("sha256-/oMyCnu+AeIBSaayhp5ao3aqH7iB/i0qbZ9lPRLB7Og=")
+          .CustomSources(
+            "sha256-/oMyCnu+AeIBSaayhp5ao3aqH7iB/i0qbZ9lPRLB7Og=",
+            "https://connect.facebook.net",
+            "sha256-U/Q0S1XsbhTX4bq03uFoRv/xl8x/9Dh0dCFy5bxFj6o=",
+            "https://fonts.googleapis.com/"
+          )
         )
       );
 
@@ -101,6 +113,7 @@ namespace API
 
       // app.UseHttpsRedirection();
 
+      app.UseHttpsRedirection();
       app.UseRouting();
 
       app.UseDefaultFiles();
