@@ -24,6 +24,13 @@ namespace Application.Core
                         source => source.Attendees.FirstOrDefault(x => x.IsHost)
                             .AppUser.UserName));
 
+            CreateMap<Activity, Profiles.UserActivityDTO>()
+                .ForMember(
+                    destination => destination.HostUsername,
+                    opt => opt.MapFrom(
+                        source => source.Attendees.FirstOrDefault(x => x.IsHost)
+                            .AppUser.UserName));
+
             CreateMap<AppUser, Profiles.Profile>()
                 .ForMember(
                     destination => destination.Image,
