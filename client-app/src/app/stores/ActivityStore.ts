@@ -116,6 +116,7 @@ export default class ActivityStore {
       const { data, pagination } = await agent.Activities.list(
         this.axiosParams
       );
+
       const activities = data.map((act) => ({
         ...act,
         date: new Date(act.date!),

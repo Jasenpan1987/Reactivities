@@ -37,6 +37,7 @@
   "scripts": {
     "start": "react-scripts start",
     "startHttps": "HTTPS=true npm start",
+    "startHttp": "HTTPS=false npm start",
     "build": "react-scripts build",
     "postbuild": "rimraf ../API/wwwroot && mv build ../API/wwwroot",
     "test": "react-scripts test",

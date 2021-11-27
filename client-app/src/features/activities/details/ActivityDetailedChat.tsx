@@ -38,7 +38,6 @@ export default observer(function ActivityDetailedChat({ activityId }: IProps) {
         <Formik<{ body: string }>
           initialValues={{ body: "" }}
           onSubmit={async (values, { resetForm }) => {
-            console.log("xxxxx");
             await commentStore.addComment(values);
             resetForm();
           }}
