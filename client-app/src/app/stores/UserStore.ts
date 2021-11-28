@@ -93,14 +93,10 @@ export default class UserStore {
 
   register = async (creds: IUserFormValues) => {
     try {
-      const user = await agent.Account.register(creds);
-      store.commonStore.setToken(user.token);
-      this.startRefreshTokenTimer(user);
+      await agent.Account.register(creds);
       runInAction(() => {
-        store.commonStore.setToken(user.token);
-        this.user = user;
+        history.push(`/account/registerSuccess?email=${creds.email}`);
         store.modalStore.closeModal();
-        history.push("/activities");
       });
     } catch (error) {
       throw error;
